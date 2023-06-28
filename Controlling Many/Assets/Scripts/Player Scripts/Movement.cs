@@ -20,21 +20,29 @@ public class Movement : MonoBehaviour
     private bool _forwardClear = true;
     private bool _backClear = true;
 
+    //Boolean to lock movement after particular maze section end
+    private bool _lockedMovement = false;
 
     // Update is called once per frame
     void Update()
     {
-        _moveInput();
+        if (!_lockedMovement)
+        {
+            _moveInput();
+        }
     }
 
     private void FixedUpdate()
     {
-        if (_movement != Vector3.zero && _isGrounded)
+        if (!_lockedMovement)
         {
-            _movePosition();
+            if (_movement != Vector3.zero && _isGrounded)
+            {
+                _movePosition();
+            }
+            _checkGrounded();
+            _checkSides();
         }
-        _checkGrounded();
-        _checkSides();
     }
 
     //The _moveInput function is to get the input of the player. This is not directly called in fixed update as i dont want any input to be lost.
@@ -82,7 +90,7 @@ public class Movement : MonoBehaviour
     //This function is used to check whether the sides of the cube are clear for motion.
     private void _checkSides()
     {
-        if (Physics.Raycast(transform.position, Vector3.forward, 1.0f))
+        if (Physics.Raycast(transform.position, Vector3.forward, 1.0f, 1, QueryTriggerInteraction.Ignore))
         {
             _forwardClear = false;
         }
@@ -90,7 +98,7 @@ public class Movement : MonoBehaviour
         {
             _forwardClear= true;
         }
-        if (Physics.Raycast(transform.position, Vector3.back, 1.0f))
+        if (Physics.Raycast(transform.position, Vector3.back, 1.0f,1,QueryTriggerInteraction.Ignore))
         {
             _backClear = false;
         }
@@ -98,7 +106,7 @@ public class Movement : MonoBehaviour
         {
             _backClear = true;
         }
-        if (Physics.Raycast(transform.position, Vector3.left, 1.0f))
+        if (Physics.Raycast(transform.position, Vector3.left, 1.0f, 1, QueryTriggerInteraction.Ignore))
         {
             _leftClear = false;
         }
@@ -106,7 +114,7 @@ public class Movement : MonoBehaviour
         {
             _leftClear = true;
         }
-        if (Physics.Raycast(transform.position, Vector3.right, 1.0f))
+        if (Physics.Raycast(transform.position, Vector3.right, 1.0f, 1, QueryTriggerInteraction.Ignore))
         {
             _rightClear = false;
         }
@@ -115,4 +123,9 @@ public class Movement : MonoBehaviour
             _rightClear = true;
         }
     }
+
+    //getter and setter methods to lock player cube movement
+    public bool GetLockedMovement() { return _lockedMovement; }
+
+    public void SetLockedMovement(bool change) { _lockedMovement = change; }
 }
